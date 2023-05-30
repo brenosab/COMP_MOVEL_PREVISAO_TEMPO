@@ -14,19 +14,42 @@ type Weather = {
   visibility: string;
 };
 
+enum WeatherType {
+  Ensolarado = "Ensolarado",
+  Nublado = "Nublado",
+  Chuvoso = "Chuvoso",
+};
+
 export default function App() {
   const [form, setForm] = useState<Weather>();
+  const [weatherType, setWeatherType] = useState<WeatherType>();
 
   useEffect(() => {
-    console.log(data);
     const max = data.length;
     const randomNumber = getRandomNumber(max);
-    setForm(data[randomNumber]);
+    const _form = data[randomNumber];
+    const weatherType = getWeatherType(_form.daily_summary.toLowerCase());
+    setForm(_form);
+    setWeatherType(weatherType);
   }, []);
 
-  function getRandomNumber(max: number) {
-    return Math.floor(Math.random() * max);
+  const isEnsolarado = (text: string) => (text.includes('ensolarado') || text.includes('sol') || text.includes('quente'));
+  const isNublado = (text: string) => (text.includes('nublado') || text.includes('encoberto') || text.includes('nuvens'));
+  const isChuvoso = (text: string) => (text.includes('chuvoso') || text.includes('chuva'));
+
+  const getWeatherType = (text: string) => {
+    if (isEnsolarado(text)) {
+      return WeatherType.Ensolarado;
+    }
+    if (isNublado(text)) {
+      return WeatherType.Nublado;
+    }
+    if (isChuvoso(text)) {
+      return WeatherType.Chuvoso;
+    }
   }
+
+  const getRandomNumber = (max: number) => Math.floor(Math.random() * max);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -42,11 +65,11 @@ export default function App() {
       </View>
       <View style={[styles.row, { flex: 1 }]}>
         <Text style={styles.text}>
-          Ensolarado
+          {weatherType}
         </Text>
       </View>
       <View style={[styles.row, { flex: 2 }]}>
-        <Text style={{ fontSize: 144,     fontWeight: '700' }}>
+        <Text style={{ fontSize: 144, fontWeight: '700' }}>
           {form?.temperature}
         </Text>
       </View>
